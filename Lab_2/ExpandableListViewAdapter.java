@@ -1,6 +1,7 @@
 package com.example.isabelle.lab21;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,13 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> listParentData;
     private HashMap<String, List<String>> listChildData;
+    private int selectedGroup = -1, selectedChild = -1;
+
+    public void updateSelection(int selectedGroup, int selectedChild) {
+        this.selectedGroup = selectedGroup;
+        this.selectedChild = selectedChild;
+        notifyDataSetChanged();
+    }
 
     public ExpandableListViewAdapter(Context context, List<String> listParentData, HashMap<String, List<String>>listChildData ){
         this.context = context;
@@ -94,11 +102,22 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
 
         textviewChild.setText(childText);
 
+        if (selectedGroup == groupPosition && selectedChild == childPosition) {
+            textviewChild.setBackgroundColor(Color.GREEN);
+        } else {
+            textviewChild.setBackgroundColor(Color.WHITE);
+        }
+
         return convertView;
     }
+
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }
 }
+
+
+//Rött fält när det inte finns snestreck
+// Barn avmarkerad när man skriver fel i fältet, markeras sen när

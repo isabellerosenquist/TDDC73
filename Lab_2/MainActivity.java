@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        expandableListView = (ExpandableListView)findViewById(R.id.lvExp);
+        expandableListView = (ExpandableListView) findViewById(R.id.lvExp);
 
         prepareListData();
 
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         expandableListView.setAdapter(listViewAdapter);
 
-        searchtext = (EditText)findViewById(R.id.editText);
+        searchtext = (EditText) findViewById(R.id.editText);
         searchtext.setText("/");
         searchtext.setSelection(searchtext.getText().length());
 
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         expandableListView.setChoiceMode(ExpandableListView.CHOICE_MODE_SINGLE);
 
 
-       expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int groupPosition) {
 
@@ -65,11 +65,10 @@ public class MainActivity extends AppCompatActivity {
         expandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
             @Override
             public void onGroupCollapse(int groupPosition) {
-                if(cleartext){
+                if (cleartext) {
                     searchtext.setText("/");
                     searchtext.setSelection(searchtext.getText().length());
-                }
-                else
+                } else
                     cleartext = false;
             }
         });
@@ -79,28 +78,32 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-                searchtext.setText("/"+listDataParent.get(groupPosition)+"/"+listDataChild.get(listDataParent.get(groupPosition)).get(childPosition));
+                searchtext.setText("/" + listDataParent.get(groupPosition) + "/" + listDataChild.get(listDataParent.get(groupPosition)).get(childPosition));
                 searchtext.setSelection(searchtext.getText().length());
 
-                parent.setItemChecked(selectedIndex, false);
+/*                parent.setItemChecked(selectedIndex, false);
                 int index = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
                 selectedIndex = index;
-                parent.setItemChecked(index, true);
+                parent.setItemChecked(index, true);*/
+
+                listViewAdapter.updateSelection(groupPosition, childPosition);
 
                 return false;
             }
         });
     }
 
-    private void collapseAll(int groupPosition){
+    private void collapseAll(int groupPosition) {
 
-        for(int i = 0; i < listViewAdapter.getGroupCount(); i++){
+        for (int i = 0; i < listViewAdapter.getGroupCount(); i++) {
 
-            if(i != groupPosition && expandableListView.isGroupExpanded(i))
+            if (i != groupPosition && expandableListView.isGroupExpanded(i))
                 expandableListView.collapseGroup(i);
         }
 
-    };
+    }
+
+
 
     private final TextWatcher searchWatcher = new TextWatcher() {
         @Override
@@ -120,61 +123,13 @@ public class MainActivity extends AppCompatActivity {
 
                 SearchText(s.toString());
             }
-        }
-    };
-
-                // '/
-                //searchtext.setText("/");
-             /*   cleartext = false;
-                Log.e("LOG", "before search 1");
-
-               if(!SearchText(s.toString().substring(1))){
-                   Log.e("LOG", "after search 1 - false");
-
-                   collapseAll(-1);
-
-                   searchtext.setBackgroundColor(Color.RED);
-               }
-
-                String substring2 = "";
-
-                boolean lower = false;
-
-                for(int k = 1; k < s.toString().length(); k++){
-                    char it = s.toString().charAt(k);
-
-                    if(lower){
-                        substring2 += it;
-
-                        Log.e("LOG", "before search 2");
-                        if(!SearchText(substring2)){
-                            Log.e("LOG", "after search 2 - false");
-
-                            Log.e("LOG", substring2);
-
-                            collapseAll(-1);
-
-                            searchtext.setBackgroundColor(Color.RED);
-                        }
-
-                    }
-                    if(it == '/'){
-                        lower = true;
-                    }
-
-                }
-                if (!substring2.equals("")) {
-                    selectChild(substring2);
-                }
-
-                cleartext = true;
-
+            else{
+                searchtext.setBackgroundColor(Color.RED);
             }
         }
     };
-*/
 
-    public void selectChild(String substring2){
+    public void selectChild(String substring2) {
 
         //System.out.println("Substring2: " + substring2);
         boolean isFound = false;
@@ -182,45 +137,67 @@ public class MainActivity extends AppCompatActivity {
         int saveGroup = -1;
         int saveChild = -1;
 
-        for(int i = 0; i <listViewAdapter.getGroupCount(); i++){
+        for (int i = 0; i < listViewAdapter.getGroupCount(); i++) {
 
-            if(!expandableListView.isGroupExpanded(i))
+            if (!expandableListView.isGroupExpanded(i))
                 continue;
 
-            for(int j = 0; j < listViewAdapter.getChildrenCount(i); j++){
+            for (int j = 0; j < listViewAdapter.getChildrenCount(i); j++) {
 
                 Boolean isLast = false;
-                if (j == listViewAdapter.getChildrenCount(i)-1)
+                if (j == listViewAdapter.getChildrenCount(i) - 1)
                     isLast = true;
-                TextView textView2 = (TextView)listViewAdapter.getChildView(i, j, isLast, null, null).findViewById(R.id.child_layout);
-                if(substring2.equals(textView2.getText())){
+                TextView textView2 = (TextView) listViewAdapter.getChildView(i, j, isLast, null, null).findViewById(R.id.child_layout);
+                textView2.setBackgroundColor(Color.WHITE);
+                if (substring2.equals(textView2.getText())) {
                     isFound = true;
+
+                    textView2.setBackgroundColor(Color.GREEN);
+
                     saveChild = j;
                     saveGroup = i;
                     break;
                 }
+                else{
+                    textView2.setBackgroundColor(Color.WHITE);
+                }
             }
 
-            if(isFound)
+            if (isFound)
                 break;
         }
-        if(saveChild != -1 && saveGroup != -1 && isFound){
-            expandableListView.setItemChecked(selectedIndex,false);
+        if (saveChild != -1 && saveGroup != -1 && isFound) {
+/*            expandableListView.setItemChecked(selectedIndex, false);
             int index = expandableListView.getFlatListPosition(ExpandableListView.getPackedPositionForChild(saveGroup, saveChild));
             selectedIndex = index;
-            expandableListView.setItemChecked(selectedIndex,true);
-            
+            expandableListView.setItemChecked(selectedIndex, true);
+            expandableListView.setSelectedChild(saveGroup, saveChild, true);*/
+
+            listViewAdapter.updateSelection(saveGroup, saveChild);
+
         }
+      /*  else{
+            expandableListView.setSelectedChild(saveGroup, saveChild, false);
+        }*/
     }
 
-    private void SearchText(String s){
+    private void SearchText(String s) {
         Log.e("LOG", "Inside search text ----");
         String top = "";
         String child = "";
         boolean matchesTop = false;
         boolean matchesChild = false;
+        boolean childSet = false;
+        boolean isExpanded = false;
+
+        if (s.isEmpty() ){
+            searchtext.setBackgroundColor(Color.RED);
+        }
+        else {
 
         StringTokenizer st = new StringTokenizer(s.substring(1), "/");
+
+        while (st.hasMoreElements()) {
 
             top = st.nextToken();
 
@@ -228,23 +205,38 @@ public class MainActivity extends AppCompatActivity {
 
             for (int j = 0; j < listViewAdapter.getGroupCount(); j++) {
 
-                if (top.equals(listDataParent.get(j)) ) {
+                if (top.equals(listDataParent.get(j))) {
+                    matchesTop = true;
                     if (!expandableListView.isGroupExpanded(j)) {
 
-                        expandableListView.expandGroup(j);
+                        if (!isExpanded) {
+                            expandableListView.expandGroup(j);
+                            isExpanded = true;
+                        }
+
                         Log.d("===============", j + "");
                     }
 
                     Log.e("LOG", "246 expand true");
                     while (st.hasMoreTokens()) {
                         child = st.nextToken();
-                        Log.e("LOG", "read child");
+
                         // if (child != "") {
                         for (int k = 0; k < listViewAdapter.getChildrenCount(j); k++) {
+                            childSet = true;
+                            listViewAdapter.notifyDataSetChanged();
+
+                            selectChild(child);
+
                             if (child.equals(listViewAdapter.getChild(j, k))) {
+                                matchesChild = true;
+                                Log.e("LOG", "read child " + child);
+
 
                                 int selectedIndex = expandableListView.getFlatListPosition(ExpandableListView.getPackedPositionForChild(j, k));
-                                expandableListView.setItemChecked(selectedIndex, false);
+                                expandableListView.setItemChecked(selectedIndex, true);
+
+                                //Gör child-view markerad, funkar ej
 
                             } else if ((listViewAdapter.getChild(j, k)).toString().contains(child)) {
                                 matchesChild = true;
@@ -259,24 +251,69 @@ public class MainActivity extends AppCompatActivity {
 
                 //break;
 
+                /*
+                * child true == hittat/kan ev hitta en child match
+                *
+                *
+                * false false == inget passar alls == sätt färg till röd
+                * false child true parent ==
+                * false parent true child ==
+                * tru true ==
+                * */
 
-                if (!matchesTop || !matchesChild) {
-                    // Set text to white
-                    searchtext.setBackgroundColor(Color.WHITE);
+
+                if (matchesTop) { // matchesTop
+                    if (childSet) {
+                        if (matchesChild) {
+                            searchtext.setBackgroundColor(Color.WHITE);
+                        } else {
+                            searchtext.setBackgroundColor(Color.RED);
+                            listViewAdapter.notifyDataSetChanged();
+                        }
+                    } else {
+                        searchtext.setBackgroundColor(Color.WHITE);
+                    }
                 } else {
-                    // Set text to red
+                    searchtext.setBackgroundColor(Color.RED);
+                    listViewAdapter.notifyDataSetChanged();
+                }
+
+
+
+
+              /* if(!matchesTop){
                     searchtext.setBackgroundColor(Color.RED);
                 }
+                else if(!matchesChild){
+                    searchtext.setBackgroundColor(Color.RED);
+                }
+                else if(!matchesTop && matchesChild){
+                    searchtext.setBackgroundColor(Color.RED);
+                }
+                else if(matchesTop && !matchesChild){
+                    searchtext.setBackgroundColor(Color.RED);
+                }
+                else{
+                    searchtext.setBackgroundColor(Color.WHITE);
+                }*/
+
+
+              /* if (!matchesTop || !matchesChild) {
+                    // Set text to white
+                    searchtext.setBackgroundColor(Color.RED);
+                } else {
+                    // Set text to red
+                    searchtext.setBackgroundColor(Color.WHITE);
+                }*/
             }
+        }
 
         //return false;
-    };
+        }
+    }
 
 
-
-
-
-    private void prepareListData(){
+    private void prepareListData() {
 
         listDataParent = new ArrayList<String>();
         listDataChild = new HashMap<String, List<String>>();
